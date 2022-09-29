@@ -6,7 +6,7 @@ import time
 from frameioclient import FrameioClient
 
 import requests
-from pySmartDL import SmartDL
+#from pySmartDL import SmartDL
 
 API_ENDPOINT = "https://florc4u1li.execute-api.us-east-1.amazonaws.com/autoDownloadAPI"
 POLL_RATE = 2
