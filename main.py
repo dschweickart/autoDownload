@@ -39,9 +39,9 @@ log.addHandler(fh)
 log.addHandler(ch)
 ######################################################
 
-
+print("POLLING FOR NEW EVENTS...")
 while True:
-    print("POLLING FOR NEW EVENTS...")
+    
     ####################################################
     ### Set up Variables
     #token = os.environ.get('FRAMEIO_AUTH_TOKEN')
