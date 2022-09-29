@@ -1,18 +1,18 @@
-import json
 import logging
 import logging.handlers
 import os
 import time
-from frameioclient import FrameioClient
 
 import requests
-#from pySmartDL import SmartDL
+from frameioclient import FrameioClient
 
 API_ENDPOINT = "https://florc4u1li.execute-api.us-east-1.amazonaws.com/autoDownloadAPI"
 POLL_RATE = 2
 DESTINATION = "~/fioDownload"
+LOG_PATH = '~/.fio/logs/auto_download.log'
 SKIP_EXISTING = True
 PROJECT_ID = "a46ef2de-475a-4a60-a135-cc309df01ef4"
+PATH_FILTER = ".RDC" #Includes in filepath
 
 ######################################################
 ### SETUP LOGGING
@@ -21,7 +21,7 @@ log = logging.getLogger('main')
 log.propagate = False
 log.setLevel(logging.DEBUG)
 # create file handler which logs even debug messages
-logpath = '~/.fio/logs/auto_download.log'
+logpath = LOG_PATH
 if not os.path.exists(os.path.dirname(logpath)):
     os.makedirs(os.path.dirname(logpath))
 fh = logging.handlers.RotatingFileHandler(logpath, maxBytes=1024*1024*500, backupCount=3)
@@ -79,7 +79,8 @@ while True:
         token = message['token']
         asset_blob = message['asset_blob']
 
-
+        if not PATH_FILTER in filepath:
+            continue
         ####################################################
         ### Check if exists
 
