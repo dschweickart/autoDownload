@@ -1,21 +1,40 @@
+import json
 import logging
 import logging.handlers
 import os
+import sys
 import time
 
 import requests
 from frameioclient import FrameioClient
 
-settings = {
+######################################################
+### GET DOWNLOAD SETTINGS
+default_settings = {
 'API_ENDPOINT' : "https://florc4u1li.execute-api.us-east-1.amazonaws.com/autoDownloadAPI" ,
 'POLL_RATE' : 2 ,
-'DESTINATION' : "~/fioDownload/space test" ,
+'DESTINATION' : "~/fioDownload" ,
 'LOG_PATH' : '~/.fio/logs/auto_download.log' ,
 'SKIP_EXISTING' : True ,
 'PROJECT_ID' : "a46ef2de-475a-4a60-a135-cc309df01ef4" ,
-'PATH_FILTER' : ".RDC" #Includes in filepath
+'PATH_FILTER' : ".RDC"
 }
+
+SETTINGS_PATH = os.path.expanduser("~/.fio/autoDownloadSettings.json")
+
+if os.path.isfile(SETTINGS_PATH):
+    settings = json.load(SETTINGS_PATH)
+else:
+    with open(SETTINGS_PATH, "w") as f:
+        f.write(json.dumps(default_settings))
+
 print(settings)
+
+if not settings.get('PROJECT_ID'):
+    print('ERROR: NO PEOJECT ID PROVIDED')
+    sys.exit()
+######################################################
+
 ######################################################
 ### SETUP LOGGING
 # create logger with 'application'
@@ -41,13 +60,9 @@ log.addHandler(fh)
 log.addHandler(ch)
 ######################################################
 
-print("POLLING FOR NEW EVENTS...")
+
+log.info("POLLING FOR NEW EVENTS...")
 while True:
-    
-    ####################################################
-    ### Set up Variables
-    #token = os.environ.get('FRAMEIO_AUTH_TOKEN')
-    #client = FrameioClient(token)
 
     ####################################################
     ### Poll API endpoint
@@ -94,7 +109,7 @@ while True:
         
         if os.path.isfile(download_path):
             if settings['SKIP_EXISTING']:
-                print(f'SKIPPING EXISTING FILE: {download_path}')
+                log.info(f'SKIPPING EXISTING FILE: {download_path}')
                 continue
             else:
                 os.remove(download_path)
@@ -105,7 +120,7 @@ while True:
         try:
             download = client.assets.download(asset_blob , download_dir)
         except Exception as e:
-            print(f'ERROR ON DOWNLOAD: {e}')
+            log.error(f'ERROR ON DOWNLOAD: {e}')
         #download = client.assets._download(assetID , download_dir)
 
         #obj = SmartDL(download_url, download_path)
