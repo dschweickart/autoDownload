@@ -4,12 +4,16 @@ import logging.handlers
 import os
 import sys
 import time
+from pprint import pformat
 
 import requests
 from frameioclient import FrameioClient
 
 ######################################################
 ### GET DOWNLOAD SETTINGS
+
+SETTINGS_PATH = os.path.expanduser("~/.fio/autoDownloadSettings.json")
+
 default_settings = {
 'API_ENDPOINT' : "https://florc4u1li.execute-api.us-east-1.amazonaws.com/autoDownloadAPI" ,
 'POLL_RATE' : 2 ,
@@ -20,15 +24,15 @@ default_settings = {
 'PATH_FILTER' : ".RDC"
 }
 
-SETTINGS_PATH = os.path.expanduser("~/.fio/autoDownloadSettings.json")
-
 if os.path.isfile(SETTINGS_PATH):
-    settings = json.load(SETTINGS_PATH)
+    with open(SETTINGS_PATH, "r") as f:
+        settings = json.load(f)
+        settings['SETTINGS_PATH'] = SETTINGS_PATH
 else:
     with open(SETTINGS_PATH, "w") as f:
         f.write(json.dumps(default_settings))
-
-print(settings)
+    settings = default_settings
+    settings['SETTINGS_PATH'] = SETTINGS_PATH
 
 if not settings.get('PROJECT_ID'):
     print('ERROR: NO PEOJECT ID PROVIDED')
@@ -60,6 +64,7 @@ log.addHandler(fh)
 log.addHandler(ch)
 ######################################################
 
+log.info(pformat(settings))
 
 log.info("POLLING FOR NEW EVENTS...")
 while True:
@@ -121,12 +126,6 @@ while True:
             download = client.assets.download(asset_blob , download_dir)
         except Exception as e:
             log.error(f'ERROR ON DOWNLOAD: {e}')
-        #download = client.assets._download(assetID , download_dir)
-
-        #obj = SmartDL(download_url, download_path)
-        #obj.start()
-        
-        #os.system(f'curl "{download_url}" -o "{download_path}"')
 
     time.sleep(settings['POLL_RATE'])
 
