@@ -75,7 +75,10 @@ while True:
         #'token' : token ,
         'project_id' : settings['PROJECT_ID']
     }
-    response = requests.get(settings['API_ENDPOINT'], params=params)
+    try:
+        response = requests.get(settings['API_ENDPOINT'], params=params)
+    except Exception as e:
+        log.error(f"ERROR on API request: {e}")
 
     ####################################################
     ### Validate Reponse
