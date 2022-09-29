@@ -9,7 +9,7 @@ from frameioclient import FrameioClient
 settings = {
 'API_ENDPOINT' : "https://florc4u1li.execute-api.us-east-1.amazonaws.com/autoDownloadAPI" ,
 'POLL_RATE' : 2 ,
-'DESTINATION' : "~/fioDownload" ,
+'DESTINATION' : "~/fioDownload/space test" ,
 'LOG_PATH' : '~/.fio/logs/auto_download.log' ,
 'SKIP_EXISTING' : True ,
 'PROJECT_ID' : "a46ef2de-475a-4a60-a135-cc309df01ef4" ,
@@ -102,7 +102,10 @@ while True:
         ####################################################
         ### Download file
         client = FrameioClient(token)
-        download = client.assets.download(asset_blob , download_dir)
+        try:
+            download = client.assets.download(asset_blob , download_dir)
+        except Exception as e:
+            print(f'ERROR ON DOWNLOAD: {e}')
         #download = client.assets._download(assetID , download_dir)
 
         #obj = SmartDL(download_url, download_path)
